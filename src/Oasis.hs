@@ -185,15 +185,14 @@ main = do
       when (length args /= 2) $
         error "usage: oasis buy-gem sell-gem"
       let [buyGem, sellGem] = args
-      withFile "logs" ReadMode $ \handle -> do
-        withCurrentDirectory dappPath $
-          EVM.Solidity.readSolc "out/matching_market.sol.json" >>=
-            \case
-              Just (contracts, cache) -> do
-                let dapp = dappInfo "." contracts cache
-                market <-
-                  readMarket dapp handle
-                    (\x -> isBuyOf (read buyGem) x && isSellOf (read sellGem) x)
-                liftIO (showMarket market)
-              Nothing ->
-                error "Oasis Solidity JSON error"
+      withCurrentDirectory dappPath $
+        EVM.Solidity.readSolc "out/matching_market.sol.json" >>=
+          \case
+            Just (contracts, cache) -> do
+              let dapp = dappInfo "." contracts cache
+              market <-
+                readMarket dapp stdin
+                  (\x -> isBuyOf (read buyGem) x && isSellOf (read sellGem) x)
+              liftIO (showMarket market)
+            Nothing ->
+              error "Oasis Solidity JSON error"
