@@ -168,6 +168,10 @@ isSellOf (Addr gem) =
     Take _ (x, _) _ -> x == gem
     _ -> False
 
+isKill :: Order -> Bool
+isKill (Kill _) = True
+isKill _ = False
+
 showMarket :: Market -> IO ()
 showMarket market = do
   let
@@ -198,7 +202,7 @@ main = do
               let dapp = dappInfo "." contracts cache
               market <-
                 readMarket dapp stdin
-                  (\x -> isBuyOf (read buyGem) x && isSellOf (read sellGem) x)
+                  (\x -> isKill x || (isBuyOf (read buyGem) x && isSellOf (read sellGem) x))
               liftIO (showMarket market)
             Nothing ->
               error "Oasis Solidity JSON error"

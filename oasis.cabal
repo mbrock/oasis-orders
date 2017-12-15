@@ -1,5 +1,5 @@
 name: oasis-orders
-version: 0.7
+version: 0.7.1
 synopsis: Parse order books from OasisDEX JSON logs
 homepage: https://github.com/mbrock/oasis
 license: GPL-3
