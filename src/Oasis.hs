@@ -24,7 +24,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Vector (Vector)
 import Pipes
 import System.Directory (withCurrentDirectory)
-import System.Environment (getArgs)
+import System.Environment (getArgs, lookupEnv)
 import System.IO
 import Text.Printf
 
@@ -179,18 +179,21 @@ showMarket market = do
 main :: IO ()
 main = do
   args <- getArgs
-  when (length args /= 3) $
-    error "usage: oasis dapp-path buy-gem sell-gem"
-  let [dappPath, buyGem, sellGem] = args
-  withFile "logs" ReadMode $ \handle -> do
-    withCurrentDirectory dappPath $
-      EVM.Solidity.readSolc "out/matching_market.sol.json" >>=
-        \case
-          Just (contracts, cache) -> do
-            let dapp = dappInfo "." contracts cache
-            market <-
-              readMarket dapp handle
-                (\x -> isBuyOf (read buyGem) x && isSellOf (read sellGem) x)
-            liftIO (showMarket market)
-          Nothing ->
-            error "Oasis Solidity JSON error"
+  lookupEnv "OASIS_DAPP_PATH" >>= \case
+    Nothing -> error "OASIS_DAPP_PATH not set"
+    Just dappPath -> do
+      when (length args /= 2) $
+        error "usage: oasis buy-gem sell-gem"
+      let [buyGem, sellGem] = args
+      withFile "logs" ReadMode $ \handle -> do
+        withCurrentDirectory dappPath $
+          EVM.Solidity.readSolc "out/matching_market.sol.json" >>=
+            \case
+              Just (contracts, cache) -> do
+                let dapp = dappInfo "." contracts cache
+                market <-
+                  readMarket dapp handle
+                    (\x -> isBuyOf (read buyGem) x && isSellOf (read sellGem) x)
+                liftIO (showMarket market)
+              Nothing ->
+                error "Oasis Solidity JSON error"
