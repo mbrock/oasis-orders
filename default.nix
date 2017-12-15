@@ -1,18 +1,19 @@
-{ mkDerivation, aeson, base, base16-bytestring, bytestring
-, data-dword, directory, hevm, lens, lens-aeson, pipes
-, pipes-bytestring, pipes-group, stdenv, text, vector, wreq
+{ mkDerivation, aeson, base, base16-bytestring, binary, bytestring
+, containers, data-dword, directory, hevm, lens, lens-aeson, pipes
+, pipes-text, stdenv, text, vector
 }:
 mkDerivation {
-  pname = "oasis";
+  pname = "oasis-orders";
   version = "0.5";
   src = ./.;
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [
-    aeson base base16-bytestring bytestring data-dword directory hevm
-    lens lens-aeson pipes pipes-bytestring pipes-group text vector wreq
+    aeson base base16-bytestring binary bytestring containers
+    data-dword directory hevm lens lens-aeson pipes pipes-text text
+    vector
   ];
   homepage = "https://github.com/dapphub/libethjet";
-  description = "Binding to libethjet for Ethereum precompiled contracts";
+  description = "Parse order books from OasisDEX JSON logs";
   license = stdenv.lib.licenses.gpl3;
 }
