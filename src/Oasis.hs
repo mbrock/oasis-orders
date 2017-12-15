@@ -41,6 +41,7 @@ newtype Id = Id W256
 data Order
   = Make Id (Word160, Word256) (Word160, Word256)
   | Take Id (Word160, Word256) (Word160, Word256)
+  | Kill Id
   | Spam Text
   deriving Show
 
@@ -77,6 +78,9 @@ decode dapp log = do
   topic0    <- preview (logTopics . ix 0) log
   eventType <- preview (dappEventMap . ix (W256 topic0)) dapp
   case eventType of
+    Event "LogKill" _ _ -> do
+      orderId <- preview (logTopics . ix 1 . to fromIntegral) log
+      pure $ Kill (Id orderId)
     Event "LogMake" _ _ -> do
       orderId <- preview (logTopics . ix 1 . to fromIntegral) log
       args <-
@@ -138,6 +142,8 @@ applyOrder market =
             else Nothing
       in
         Map.update f x market
+    Kill x ->
+      Map.delete x market
     _ ->
       market
 

@@ -1,7 +1,7 @@
 name: oasis-orders
-version: 0.6
+version: 0.7
 synopsis: Parse order books from OasisDEX JSON logs
-homepage: https://github.com/dapphub/libethjet
+homepage: https://github.com/mbrock/oasis
 license: GPL-3
 license-file: LICENSE
 author: Mikael Brockman
